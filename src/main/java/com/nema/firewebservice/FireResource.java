@@ -4,6 +4,8 @@
  */
 package com.nema.firewebservice;
 
+import com.google.gson.Gson;
+import java.util.ArrayList;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -40,9 +42,12 @@ public class FireResource {
         String fireJSONString = "";
         
         // get fires from db
+        FireDatabaseClient db = new FireDatabaseClient();
+        ArrayList<FireDetails> fires = db.getFires();
+        db.close();
         
         // convert to json string
-        
+        fireJSONString = new Gson().toJson(fires);
         
         return fireJSONString;
     }
@@ -52,10 +57,18 @@ public class FireResource {
      * @param content representation for the resource
      */
     @POST
-    @Path("/{fireId}")
-    public void sendFireTruck(@PathParam("fireId") int fireId) {
+    @Path("/{fireId}/{truckId}")
+    public void sendFireTruck(@PathParam("fireId") int fireId, @PathParam("truckId") int truckId) {
         
         // add fire truck to the database
+        Firetruck truck = new Firetruck(
+            truckId,
+            "Truck "+ truckId,
+            fireId);
+        
+        FireDatabaseClient db = new FireDatabaseClient();
+        db.addFireTruck(truck);
+        db.close();
         
     }
 }
